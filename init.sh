@@ -1,10 +1,10 @@
 #!/bin/bash
-set -e
-
-/opt/startup.sh &
 
 GEOSERVER_URL="http://localhost:8080/geoserver"
 AUTH="$GEOSERVER_ADMIN_USER:$GEOSERVER_ADMIN_PASSWORD"
+
+echo "Starting GeoServer..."
+/opt/startup.sh &
 
 echo "Waiting for GeoServer to start..."
 for i in $(seq 1 60); do

@@ -10,7 +10,7 @@ services:
       - key: GEOSERVER_ADMIN_PASSWORD
         value: testing123
       - key: JAVA_OPTS
-        value: "-Xms128m -Xmx256m"
+        value: "-Xms256m -Xmx512m"
       - key: POSTGIS_HOST
         value: dpg-d82buslckfvc73f7m3j0-a
       - key: POSTGIS_PORT
