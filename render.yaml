@@ -8,19 +8,19 @@ services:
       - key: GEOSERVER_ADMIN_USER
         value: admin
       - key: GEOSERVER_ADMIN_PASSWORD
-        value: changeme123
+        value: testing123
       - key: JAVA_OPTS
         value: "-Xms128m -Xmx256m"
       - key: POSTGIS_HOST
-        value: dpg-d812l83rjlhs73aq9fd0-a
+        value: dpg-d82buslckfvc73f7m3j0-a
       - key: POSTGIS_PORT
         value: "5432"
       - key: POSTGIS_DB
-        value: geoserver_ot30
+        value: geodb_0hyd
       - key: POSTGIS_USER
-        value: geoserver_ot30_user
+        value: geodb_0hyd_user
       - key: POSTGIS_PASSWORD
-        value: b7dBqprFdW7WBCnL0z1MTvXirSYJ0mZG
+        value: RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
       - key: POSTGIS_SCHEMA
         value: public
       - key: GEOSERVER_WORKSPACE
