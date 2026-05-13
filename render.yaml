@@ -25,3 +25,5 @@ services:
         value: public
       - key: GEOSERVER_WORKSPACE
         value: myworkspace
+      - key: RENDER_EXTERNAL_URL
+        value: https://geoserver-4u2y.onrender.com
