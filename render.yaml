@@ -27,6 +27,6 @@ services:
         value: myworkspace
       - key: RENDER_EXTERNAL_URL
         value: SHAPEFILE_NAME 
-      - key: RENDER_EXTERNAL_URL
+      - key: Siricilla
       
         value: https://geoserver-4u2y.onrender.com
