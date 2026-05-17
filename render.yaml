@@ -4,6 +4,7 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
+    healthCheckPath: /geoserver/web
     envVars:
       - key: GEOSERVER_ADMIN_USER
         value: admin
