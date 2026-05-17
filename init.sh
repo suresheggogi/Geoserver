@@ -4,6 +4,9 @@ set -e
 GEOSERVER_URL="http://localhost:8080/geoserver"
 AUTH="$GEOSERVER_ADMIN_USER:$GEOSERVER_ADMIN_PASSWORD"
 
+export PORT=${PORT:-8080}
+sed -i "s/port=\"8080\"/port=\"${PORT}\"/" /usr/local/tomcat/conf/server.xml
+
 echo "Starting GeoServer..."
 /opt/startup.sh &
 
