@@ -13,6 +13,8 @@ ENV POSTGIS_PASSWORD=
 ENV POSTGIS_SCHEMA=public
 ENV GEOSERVER_WORKSPACE=myworkspace
 
+# Copy shapefiles into the container
+COPY shapefiles/ /opt/geoserver_data/shapefiles/
 COPY init.sh /init.sh
 RUN chmod +x /init.sh
 

@@ -22,6 +22,22 @@ if [ -n "$RENDER_EXTERNAL_URL" ]; then
     "$GEOSERVER_URL/rest/settings" || echo "Warning: could not set proxy base URL"
 fi
 
+# Add this block inside init.sh after the PostGIS section
+
+if [ -n "$SHAPEFILE_NAME" ]; then
+  echo "Registering shapefile store: $SHAPEFILE_NAME"
+  curl -sf -u "$AUTH" -X PUT \
+    -H "Content-Type: application/zip" \
+    --data-binary @"/opt/geoserver_data/shapefiles/${SHAPEFILE_NAME}.zip" \
+    "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores/${SHAPEFILE_NAME}/file.shp"
+fi
+
+# In init.sh, before GeoServer starts
+echo "Downloading shapefiles from S3..."
+curl -o /opt/geoserver_data/shapefiles/myshape.zip "$SHAPEFILE_S3_URL"
+
+
+
 if [ -n "$POSTGIS_HOST" ] && [ -n "$POSTGIS_DB" ]; then
   echo "Configuring PostGIS store..."
 
