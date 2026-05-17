@@ -21,6 +21,7 @@ if [ -n "$RENDER_EXTERNAL_URL" ]; then
     -d "<global><proxyBaseUrl>${RENDER_EXTERNAL_URL}/geoserver/</proxyBaseUrl></global>" \
     "$GEOSERVER_URL/rest/settings" || echo "Warning: could not set proxy base URL"
 fi
+
 # Add this block inside init.sh after the PostGIS section
 
 if [ -n "$SHAPEFILE_NAME" ]; then
@@ -30,6 +31,8 @@ if [ -n "$SHAPEFILE_NAME" ]; then
     --data-binary @"/opt/geoserver_data/shapefiles/${SHAPEFILE_NAME}.zip" \
     "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores/${SHAPEFILE_NAME}/file.shp"
 fi
+
+
 
 if [ -n "$POSTGIS_HOST" ] && [ -n "$POSTGIS_DB" ]; then
   echo "Configuring PostGIS store..."
