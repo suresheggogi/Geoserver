@@ -32,6 +32,10 @@ if [ -n "$SHAPEFILE_NAME" ]; then
     "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores/${SHAPEFILE_NAME}/file.shp"
 fi
 
+# In init.sh, before GeoServer starts
+echo "Downloading shapefiles from S3..."
+curl -o /opt/geoserver_data/shapefiles/myshape.zip "$SHAPEFILE_S3_URL"
+
 
 
 if [ -n "$POSTGIS_HOST" ] && [ -n "$POSTGIS_DB" ]; then
