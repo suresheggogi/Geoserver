@@ -26,7 +26,9 @@ services:
       - key: GEOSERVER_WORKSPACE
         value: myworkspace
       - key: RENDER_EXTERNAL_URL
-        value: SHAPEFILE_NAME 
-      - key: Siricilla
-      
         value: https://geoserver-4u2y.onrender.com
+      # Added missing shapefile vars
+      - key: SHAPEFILE_NAME
+        value: Siricilla        # filename without .zip
+      - key: SHAPEFILE_S3_URL
+        value: ""               # set this to your S3 pre-signed URL, or leave blank to use COPY
