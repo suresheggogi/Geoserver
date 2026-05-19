@@ -4,7 +4,7 @@ USER root
 RUN apt-get update && apt-get install -y curl jq && rm -rf /var/lib/apt/lists/*
 
 ENV GEOSERVER_ADMIN_USER=admin
-ENV GEOSERVER_ADMIN_PASSWORD=changeme123
+ENV GEOSERVER_ADMIN_PASSWORD=testing123
 ENV POSTGIS_HOST=
 ENV POSTGIS_PORT=5432
 ENV POSTGIS_DB=
