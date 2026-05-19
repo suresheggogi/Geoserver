@@ -14,13 +14,11 @@ ENV POSTGIS_PASSWORD=
 ENV POSTGIS_SCHEMA=public
 ENV GEOSERVER_WORKSPACE=myworkspace
 
-disk:
-  name: geoserver-data
-  mountPath: /opt/geoserver/data_dir  # ← GeoServer's entire config lives here
-  sizeMB:5 
+# 1. Backup the default data_dir INTO the image
+RUN cp -r /opt/geoserver/data_dir /opt/geoserver_data_dir_default
 
-# Copy shapefiles into GeoServer's data directory
-COPY shapefiles/ /opt/geoserver/data_dir/data/shapefiles/
+# 2. Stage shapefiles separately (disk will overwrite /data_dir on mount)
+COPY shapefiles/ /opt/geoserver_shapefiles/
 
 COPY init.sh /init.sh
 RUN chmod +x /init.sh
