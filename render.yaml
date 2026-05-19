@@ -3,17 +3,17 @@ services:
     name: geoserver
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: starter          # free plan has only 512 MB RAM — use starter for GeoServer
+    plan: starter
     healthCheckPath: /geoserver/web/wicket/bookmarkable/org.geoserver.web.GeoServerLoginPage
     disk:
-    name: geoserver-data
-    mountPath: /opt/geoserver/data_dir  # ← GeoServer's entire config lives here
-    sizeMB: 10
+      name: geoserver-data
+      mountPath: /opt/geoserver/data_dir
+      sizeGB: 10
     envVars:
       - key: GEOSERVER_ADMIN_USER
         value: admin
       - key: GEOSERVER_ADMIN_PASSWORD
-        value: changeme123
+        value: testing123
       - key: JAVA_OPTS
         value: "-Xms256m -Xmx512m -XX:+UseContainerSupport"
       - key: POSTGIS_HOST
