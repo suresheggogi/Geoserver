@@ -14,10 +14,12 @@ ENV POSTGIS_PASSWORD=
 ENV POSTGIS_SCHEMA=public
 ENV GEOSERVER_WORKSPACE=myworkspace
 
-# 1. Backup the default data_dir INTO the image
+# Backup the default data_dir from the image into a staging path.
+# When the Render disk is mounted at /opt/geoserver/data_dir and is empty
+# (first boot), init.sh copies this backup into the disk to seed it.
 RUN cp -r /opt/geoserver/data_dir /opt/geoserver_data_dir_default
 
-# 2. Stage shapefiles separately (disk will overwrite /data_dir on mount)
+# Stage shapefiles separately so init.sh can copy them to the persistent disk
 COPY shapefiles/ /opt/geoserver_shapefiles/
 
 COPY init.sh /init.sh
