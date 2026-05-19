@@ -17,7 +17,7 @@ ENV GEOSERVER_WORKSPACE=myworkspace
 # Find where GeoServer data_dir actually lives and back it up
 # The 2.28.x image uses /opt/geoserver_data as the data directory
 RUN set -e; \
-    for DIR in /opt/geoserver_data /opt/geoserver/data /var/geoserver/data /usr/local/geoserver/data /opt/geoserver/webapps/geoserver/data; do \
+    for DIR in /opt/geoserver_data /opt/geoserver/data /var/geoserver/data /usr/local/geoserver/data /opt/geoserver/webapps/geoserver/data /usr/local/tomcat/webapps/geoserver/data; do \
       if [ -f "$DIR/global.xml" ]; then \
         echo "Found GeoServer data dir at: $DIR"; \
         cp -r "$DIR" /opt/geoserver_data_dir_default; \
