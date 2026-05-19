@@ -5,6 +5,10 @@ services:
     dockerfilePath: ./Dockerfile
     plan: starter          # free plan has only 512 MB RAM — use starter for GeoServer
     healthCheckPath: /geoserver/web/wicket/bookmarkable/org.geoserver.web.GeoServerLoginPage
+    disk:
+    name: geoserver-data
+    mountPath: /opt/geoserver/data_dir  # ← GeoServer's entire config lives here
+    sizeMB: 10
     envVars:
       - key: GEOSERVER_ADMIN_USER
         value: admin
