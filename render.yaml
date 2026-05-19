@@ -8,12 +8,12 @@ services:
     disk:
       name: geoserver-data
       mountPath: /opt/geoserver/data_dir
-      sizeMB: 5
+      sizeGB: 0.02
     envVars:
       - key: GEOSERVER_ADMIN_USER
         value: admin
       - key: GEOSERVER_ADMIN_PASSWORD
-        value: testing123
+        value: changeme123
       - key: JAVA_OPTS
         value: "-Xms256m -Xmx512m -XX:+UseContainerSupport"
       - key: POSTGIS_HOST
