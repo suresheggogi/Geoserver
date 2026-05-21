@@ -13,7 +13,7 @@ services:
       - key: GEOSERVER_ADMIN_USER
         value: admin
       - key: GEOSERVER_ADMIN_PASSWORD
-        value: changeme123
+        value: testing123
       - key: RENDER_EXTERNAL_URL
         sync: false
       - key: JAVA_OPTS
