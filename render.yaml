@@ -4,16 +4,18 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: starter
-    healthCheckPath: /geoserver/web/wicket/bookmarkable/org.geoserver.web.GeoServerLoginPage
+    healthCheckPath: /geoserver/rest/about/version.json
     disk:
       name: geoserver-data
-      mountPath: /opt/geoserver/data_dir
-      sizeGB: 0.02
+      mountPath: /opt/geoserver_data        # ← was /opt/geoserver/data_dir
+      sizeGB: 1                              # ← 0.02 GB is too small; minimum 1 GB
     envVars:
       - key: GEOSERVER_ADMIN_USER
         value: admin
       - key: GEOSERVER_ADMIN_PASSWORD
         value: changeme123
+      - key: RENDER_EXTERNAL_URL            # ← was missing
+        sync: false                         # Render injects this automatically
       - key: JAVA_OPTS
         value: "-Xms256m -Xmx512m -XX:+UseContainerSupport"
       - key: POSTGIS_HOST
