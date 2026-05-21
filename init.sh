@@ -57,9 +57,9 @@ fi
 
 # ── Step 4: Proxy base URL ────────────────────────────────────────────────────
 if [ -n "$RENDER_EXTERNAL_URL" ]; then
-  echo "Setting proxy base URL..."
+  echo "Setting proxy base URL to ${RENDER_EXTERNAL_URL}/geoserver/"
   curl -s -u "$AUTH" -X PUT -H "Content-Type: application/xml" \
-    -d "<global><proxyBaseUrl>${RENDER_EXTERNAL_URL}/geoserver/</proxyBaseUrl></global>" \
+    -d "<global><settings><proxyBaseUrl>${RENDER_EXTERNAL_URL}/geoserver/</proxyBaseUrl></settings></global>" \
     "$GEOSERVER_URL/rest/settings" || echo "Warning: could not set proxy base URL"
 fi
 
