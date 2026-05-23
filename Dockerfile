@@ -1,7 +1,7 @@
 FROM docker.osgeo.org/geoserver:2.28.3
 
 USER root
-RUN apt-get update && apt-get install -y curl jq && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl jq gdal-bin postgresql-client && rm -rf /var/lib/apt/lists/*
 
 ENV GEOSERVER_DATA_DIR=/opt/geoserver/data
 ENV GEOSERVER_REQUIRE_FILE=/opt/geoserver/data/global.xml
@@ -23,8 +23,10 @@ ENV JAVA_OPTS="-Xms128m -Xmx400m \
   -Dfile.encoding=UTF-8 \
   -DGEOSERVER_CSRF_DISABLED=true"
 
-COPY scripts/setup_geoserver.sh /docker-entrypoint-init.d/setup_geoserver.sh
-RUN chmod +x /docker-entrypoint-init.d/init.sh    # ← matches the COPY target name
+COPY init.sh /docker-entrypoint-init.d/init.sh
+COPY shapefiles /opt/geoserver/shapefiles
+RUN chmod +x /docker-entrypoint-init.d/init.sh \
+ && chown -R geoserver:geoserver /opt/geoserver/shapefiles /docker-entrypoint-init.d/init.sh
 
 VOLUME ["/opt/geoserver/data"]
 EXPOSE 8080

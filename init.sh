@@ -13,6 +13,11 @@ PG_PORT="${PG_PORT:-5432}"
 PG_DATABASE="${PG_DATABASE:-geodb_0hyd}"
 PG_USER="${PG_USER:-geodb_0hyd_user}"
 PG_PASSWORD="${PG_PASSWORD:-changeme}"
+SHAPEFILE_DIR="${SHAPEFILE_DIR:-/opt/geoserver/shapefiles}"
+IMPORT_SHAPEFILES="${IMPORT_SHAPEFILES:-true}"
+
+export PGPASSWORD="${PG_PASSWORD}"
+PG_CONN="host=${PG_HOST} port=${PG_PORT} dbname=${PG_DATABASE} user=${PG_USER}"
 
 WORKSPACE="geodb"
 STORE_NAME="postgis_store"
@@ -32,6 +37,25 @@ until curl -sf "${GEOSERVER_URL}/web/" > /dev/null 2>&1; do
   echo "   ...still waiting (${WAITED}s)"
 done
 echo "GeoServer is up!"
+
+# Import any bundled shapefiles into PostGIS before publishing
+if [ "${IMPORT_SHAPEFILES}" = "true" ] && [ -d "${SHAPEFILE_DIR}" ]; then
+  echo "Importing shapefiles from ${SHAPEFILE_DIR} into PostGIS..."
+  psql "${PG_CONN}" -c "CREATE EXTENSION IF NOT EXISTS postgis;" >/dev/null 2>&1 || true
+
+  for shp in "${SHAPEFILE_DIR}"/*.shp; do
+    [ -f "${shp}" ] || continue
+    table=$(basename "${shp}" .shp)
+    if psql "${PG_CONN}" -tAc "SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '${table}';" | grep -q 1; then
+      echo "  Table '${table}' already exists in PostGIS — skipping import"
+      continue
+    fi
+
+    echo "  Importing shapefile ${shp} as table ${table}"
+    ogr2ogr -f "PostgreSQL" "PG:host=${PG_HOST} port=${PG_PORT} dbname=${PG_DATABASE} user=${PG_USER} password=${PG_PASSWORD}" \
+      "${shp}" -nln "public.${table}" -overwrite -lco GEOMETRY_NAME=geom -nlt PROMOTE_TO_MULTI
+  done
+fi
 
 # Helper: check if resource already exists
 resource_exists() {
