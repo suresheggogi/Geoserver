@@ -1,30 +1,69 @@
+# render.yaml
 services:
   - type: web
     name: geoserver
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: free
+    dockerContext: .
+    plan: starter
+    region: oregon
+    
+    # Health check path
+    healthCheckPath: /geoserver/web/
+
     envVars:
+      # GeoServer admin 
       - key: GEOSERVER_ADMIN_USER
         value: admin
       - key: GEOSERVER_ADMIN_PASSWORD
-        value: changeme123
-      - key: JAVA_OPTS
-        value: "-Xms128m -Xmx256m"
-      - key: POSTGIS_HOST
-        value: dpg-d812l83rjlhs73aq9fd0-a
-      - key: POSTGIS_PORT
+        generateValue: testing
+
+      # PostGIS connection (internal hostname = free + fast)
+      - key: PG_HOST
+        value: dpg-d82buslckfvc73f7m3j0-a
+      - key: PG_PORT
         value: "5432"
-      - key: POSTGIS_DB
-        value: geoserver_ot30
-      - key: POSTGIS_USER
-        value: geoserver_ot30_user
-      - key: POSTGIS_PASSWORD
-        value: b7dBqprFdW7WBCnL0z1MTvXirSYJ0mZG
-      - key: POSTGIS_SCHEMA
-        value: public
-      - key: GEOSERVER_WORKSPACE
-        value: myworkspace
-      - key: GEOSERVER_CSRF_WHITELIST
-        value: https://geoservers.onrender.com
-        
+      - key: PG_DATABASE
+        value: geodb_0hyd
+      - key: PG_USER
+        value: geodb_0hyd_user
+      - key: RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
+        sync: false                      
+
+      # JVM: hard-capped for 500 MB container
+      - key: JAVA_OPTS
+        value: >-
+          -Xms128m
+          -Xmx400m
+          -XX:+UseG1GC
+          -XX:MaxGCPauseMillis=200
+          -XX:+UseStringDeduplication
+          -XX:MaxMetaspaceSize=128m
+          -XX:CompressedClassSpaceSize=64m
+          -Djava.awt.headless=true
+          -Dfile.encoding=UTF-8
+          -DGEOSERVER_CSRF_DISABLED=true
+          -DSTOP.PORT=8079
+          -DSTOP.KEY=stopkey
+
+      # GeoServer tuning
+      - key: GEOSERVER_DATA_DIR
+        value: /opt/geoserver/data
+
+      # Reduce tile cache to save RAM
+      - key: GEOWEBCACHE_CACHE_DIR
+        value: /opt/geoserver/data/gwc
+
+    # Persistent disk: GeoServer config survives restarts 
+      name: geoserver-data
+      mountPath: /opt/geoserver/data
+      sizeGB: 5
+
+databases:
+  # Reference your existing Render PostgreSQL
+  # (already created, just documenting the connection here)
+  - name: geodb
+    databaseName: geodb_0hyd
+    user: geodb_0hyd_user
+    region: oregon
+    plan: free
