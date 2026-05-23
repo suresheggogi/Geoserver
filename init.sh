@@ -12,62 +12,78 @@ for i in $(seq 1 60); do
     echo "GeoServer is ready!"
     break
   fi
+  echo "  attempt $i/60..."
   sleep 5
 done
 
+# Set proxy base URL (required before any further config on Render)
 if [ -n "$RENDER_EXTERNAL_URL" ]; then
-  echo "Setting proxy base URL to $RENDER_EXTERNAL_URL/geoserver/"
-  curl -sf -u "$AUTH" -X PUT -H "Content-Type: application/xml" \
-    -d "<global><proxyBaseUrl>${RENDER_EXTERNAL_URL}/geoserver/</proxyBaseUrl></global>" \
+  echo "Setting proxy base URL to ${RENDER_EXTERNAL_URL}/geoserver/"
+  curl -sf -u "$AUTH" -X PUT \
+    -H "Content-Type: application/xml" \
+    -d "<global><settings><proxyBaseUrl>${RENDER_EXTERNAL_URL}/geoserver/</proxyBaseUrl></settings></global>" \
     "$GEOSERVER_URL/rest/settings" || echo "Warning: could not set proxy base URL"
 fi
 
 if [ -n "$POSTGIS_HOST" ] && [ -n "$POSTGIS_DB" ]; then
   echo "Configuring PostGIS store..."
 
-  WORKSPACE_EXISTS=$(curl -sf -u "$AUTH" "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE.xml" -o /dev/null -w "%{http_code}")
+  # Create workspace if needed
+  WORKSPACE_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" -u "$AUTH" \
+    "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE.json")
   if [ "$WORKSPACE_EXISTS" != "200" ]; then
     echo "Creating workspace: $GEOSERVER_WORKSPACE"
-    curl -sf -u "$AUTH" -X POST -H "Content-Type: application/xml" \
-      -d "<workspace><name>$GEOSERVER_WORKSPACE</name></workspace>" \
+    curl -sf -u "$AUTH" -X POST \
+      -H "Content-Type: application/json" \
+      -d "{\"workspace\":{\"name\":\"$GEOSERVER_WORKSPACE\"}}" \
       "$GEOSERVER_URL/rest/workspaces"
   else
     echo "Workspace $GEOSERVER_WORKSPACE already exists, skipping."
   fi
 
-  STORE_EXISTS=$(curl -sf -u "$AUTH" "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores/postgis.xml" -o /dev/null -w "%{http_code}")
+  # Create datastore if needed
+  STORE_EXISTS=$(curl -s -o /dev/null -w "%{http_code}" -u "$AUTH" \
+    "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores/postgis.json")
   if [ "$STORE_EXISTS" != "200" ]; then
     echo "Creating PostGIS data store..."
-    curl -sf -u "$AUTH" -X POST -H "Content-Type: application/xml" \
-      -d "<dataStore><name>postgis</name><connectionParameters>
-        <host>$POSTGIS_HOST</host>
-        <port>$POSTGIS_PORT</port>
-        <database>$POSTGIS_DB</database>
-        <user>$POSTGIS_USER</user>
-        <passwd>$POSTGIS_PASSWORD</passwd>
-        <dbtype>postgis</dbtype>
-        <schema>$POSTGIS_SCHEMA</schema>
-      </connectionParameters></dataStore>" \
+    curl -sf -u "$AUTH" -X POST \
+      -H "Content-Type: application/json" \
+      -d "{
+        \"dataStore\": {
+          \"name\": \"postgis\",
+          \"type\": \"PostGIS\",
+          \"enabled\": true,
+          \"connectionParameters\": {
+            \"entry\": [
+              {\"@key\":\"host\",     \"$\":\"$POSTGIS_HOST\"},
+              {\"@key\":\"port\",     \"$\":\"$POSTGIS_PORT\"},
+              {\"@key\":\"database\", \"$\":\"$POSTGIS_DB\"},
+              {\"@key\":\"user\",     \"$\":\"$POSTGIS_USER\"},
+              {\"@key\":\"passwd\",   \"$\":\"$POSTGIS_PASSWORD\"},
+              {\"@key\":\"dbtype\",   \"$\":\"postgis\"},
+              {\"@key\":\"schema\",   \"$\":\"$POSTGIS_SCHEMA\"}
+            ]
+          }
+        }
+      }" \
       "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores"
   else
     echo "PostGIS store already exists, skipping."
   fi
 
+  # Publish available (unpublished) feature types
   echo "Publishing layers from PostGIS tables..."
-  LAYER_NAMES=$(curl -sf -u "$AUTH" \
-    "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores/postgis/featuretypes.xml" \
-    | grep -oP '<name>\K[^<]+' || true)
+  AVAILABLE=$(curl -sf -u "$AUTH" \
+    "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores/postgis/featuretypes.json?list=available" \
+    | grep -oP '"string":\s*"\K[^"]+' || true)
 
-  for LAYER in $LAYER_NAMES; do
-    LAYER_EXISTS=$(curl -sf -u "$AUTH" "$GEOSERVER_URL/rest/layers/$GEOSERVER_WORKSPACE:$LAYER.xml" -o /dev/null -w "%{http_code}")
-    if [ "$LAYER_EXISTS" != "200" ]; then
-      echo "Publishing layer: $LAYER"
-      curl -sf -u "$AUTH" -X POST -H "Content-Type: application/xml" \
-        -d "<featureType><name>$LAYER</name><nativeName>$LAYER</nativeName></featureType>" \
-        "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores/postgis/featuretypes"
-    else
-      echo "Layer $LAYER already exists, skipping."
-    fi
+  for LAYER in $AVAILABLE; do
+    echo "Publishing layer: $LAYER"
+    curl -sf -u "$AUTH" -X POST \
+      -H "Content-Type: application/json" \
+      -d "{\"featureType\":{\"name\":\"$LAYER\",\"nativeName\":\"$LAYER\"}}" \
+      "$GEOSERVER_URL/rest/workspaces/$GEOSERVER_WORKSPACE/datastores/postgis/featuretypes" \
+      || echo "Warning: could not publish $LAYER"
   done
 else
   echo "POSTGIS_HOST not set — skipping PostGIS auto-configuration."

@@ -13,6 +13,9 @@ ENV POSTGIS_PASSWORD=
 ENV POSTGIS_SCHEMA=public
 ENV GEOSERVER_WORKSPACE=myworkspace
 
+# Fix: whitelist Render's domain for CSRF checks
+ENV GEOSERVER_CSRF_WHITELIST=https://geoservers.onrender.com
+
 COPY init.sh /init.sh
 RUN chmod +x /init.sh
 

@@ -25,3 +25,6 @@ services:
         value: public
       - key: GEOSERVER_WORKSPACE
         value: myworkspace
+      - key: GEOSERVER_CSRF_WHITELIST
+        value: https://geoservers.onrender.com
+        
