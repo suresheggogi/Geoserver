@@ -31,7 +31,7 @@ ENV JAVA_OPTS="-Xms256m -Xmx512m \
 
 
 #Copy startup + setup scripts
-COPY scripts/setup_geoserver.sh /docker-entrypoint-init.d/setup_geoserver.sh
+COPY scripts/setup_geoserver.sh /docker-entrypoint-init.d/init.sh
 RUN chmod +x /docker-entrypoint-init.d/setup_geoserver.sh
 
 #Persistent data dir (Render disk mounts here)
