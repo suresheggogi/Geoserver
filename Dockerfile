@@ -23,7 +23,7 @@ ENV JAVA_OPTS="-Xms128m -Xmx400m \
   -Dfile.encoding=UTF-8 \
   -DGEOSERVER_CSRF_DISABLED=true"
 
-COPY scripts/setup_geoserver.sh /docker-entrypoint-init.d/init.sh
+COPY scripts/setup_geoserver.sh /docker-entrypoint-init.d/setup_geoserver.sh
 RUN chmod +x /docker-entrypoint-init.d/init.sh    # ← matches the COPY target name
 
 VOLUME ["/opt/geoserver/data"]
