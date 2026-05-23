@@ -1,9 +1,8 @@
 FROM docker.osgeo.org/geoserver:2.28.3
+
 USER root
+RUN apt-get update && apt-get install -y curl jq && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y curl jq unzip && rm -rf /var/lib/apt/lists/*
-
-# Default env vars
 ENV GEOSERVER_ADMIN_USER=admin
 ENV GEOSERVER_ADMIN_PASSWORD=testing123
 ENV POSTGIS_HOST=
@@ -13,31 +12,6 @@ ENV POSTGIS_USER=
 ENV POSTGIS_PASSWORD=
 ENV POSTGIS_SCHEMA=public
 ENV GEOSERVER_WORKSPACE=myworkspace
-
-# Detect and backup the GeoServer data directory at build time
-RUN set -e; \
-    for DIR in /opt/geoserver_data /opt/geoserver/data /var/geoserver/data \
-               /usr/local/geoserver/data /opt/geoserver/webapps/geoserver/data \
-               /usr/local/tomcat/webapps/geoserver/data; do \
-      if [ -f "$DIR/global.xml" ]; then \
-        echo "Found GeoServer data dir at: $DIR"; \
-        cp -r "$DIR" /opt/geoserver_data_dir_default; \
-        echo "$DIR" > /opt/geoserver_data_dir_path.txt; \
-        break; \
-      fi; \
-    done; \
-    if [ ! -f /opt/geoserver_data_dir_path.txt ]; then \
-      echo "ERROR: Could not find GeoServer data dir"; \
-      find / -name "global.xml" 2>/dev/null | head -5; \
-      exit 1; \
-    fi
-
-# Copy only the required shapefile components (no .zip)
-COPY shapefiles/Siricilla.shp  /opt/geoserver_shapefiles/Siricilla.shp
-COPY shapefiles/Siricilla.shx  /opt/geoserver_shapefiles/Siricilla.shx
-COPY shapefiles/Siricilla.dbf  /opt/geoserver_shapefiles/Siricilla.dbf
-COPY shapefiles/Siricilla.prj  /opt/geoserver_shapefiles/Siricilla.prj
-COPY shapefiles/Siricilla.cpg  /opt/geoserver_shapefiles/Siricilla.cpg
 
 COPY init.sh /init.sh
 RUN chmod +x /init.sh

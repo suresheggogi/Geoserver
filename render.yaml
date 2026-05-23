@@ -3,21 +3,14 @@ services:
     name: geoserver
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: starter
-    healthCheckPath: /geoserver/rest/about/version.json
-    disk:
-      name: geoserver-data
-      mountPath: /opt/geoserver_data
-      sizeGB: 1
+    plan: free
     envVars:
       - key: GEOSERVER_ADMIN_USER
         value: admin
       - key: GEOSERVER_ADMIN_PASSWORD
-        value: testing123
-      - key: RENDER_EXTERNAL_URL
-        sync: false
+        value: changeme123
       - key: JAVA_OPTS
-        value: "-Xms256m -Xmx512m -XX:+UseContainerSupport"
+        value: "-Xms128m -Xmx256m"
       - key: POSTGIS_HOST
         value: dpg-d812l83rjlhs73aq9fd0-a
       - key: POSTGIS_PORT
@@ -32,4 +25,3 @@ services:
         value: public
       - key: GEOSERVER_WORKSPACE
         value: myworkspace
-        
