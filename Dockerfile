@@ -25,8 +25,7 @@ ENV JAVA_OPTS="-Xms128m -Xmx400m \
 
 COPY init.sh /docker-entrypoint-init.d/init.sh
 COPY shapefiles /opt/geoserver/shapefiles
-RUN chmod +x /docker-entrypoint-init.d/init.sh \
- && chown -R geoserver:geoserver /opt/geoserver/shapefiles /docker-entrypoint-init.d/init.sh
+RUN chmod +x /docker-entrypoint-init.d/init.sh
 
 VOLUME ["/opt/geoserver/data"]
 EXPOSE 8080
