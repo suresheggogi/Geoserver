@@ -15,13 +15,15 @@ ENV PG_DATABASE=geodb
 ENV PG_USER=geodb_user
 ENV PG_PASSWORD=changeme
 
+ENV PORT=8080
 ENV JAVA_OPTS="-Xms128m -Xmx400m \
   -XX:+UseG1GC \
   -XX:MaxGCPauseMillis=200 \
   -XX:MaxMetaspaceSize=128m \
   -Djava.awt.headless=true \
   -Dfile.encoding=UTF-8 \
-  -DGEOSERVER_CSRF_DISABLED=true"
+  -DGEOSERVER_CSRF_DISABLED=true \
+  -Djetty.port=\$PORT"
 
 COPY init.sh /docker-entrypoint-init.d/init.sh
 COPY shapefiles /opt/geoserver/shapefiles
@@ -31,6 +33,6 @@ VOLUME ["/opt/geoserver/data"]
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=15s --start-period=90s --retries=3 \
-  CMD curl -sf http://localhost:8080/geoserver/web/ || exit 1
+  CMD /bin/sh -c 'curl -sf "http://localhost:$PORT/geoserver/web/" || exit 1'
 
 USER geoserver
