@@ -18,7 +18,7 @@ services:
       - key: GEOSERVER_ADMIN_USER
         value: admin
       - key: GEOSERVER_ADMIN_PASSWORD
-        generateValue: true               # ← boolean, not a string
+        generateValue: testing               # ← boolean, not a string
 
       - key: PG_HOST
         value: dpg-d82buslckfvc73f7m3j0-a

@@ -19,19 +19,19 @@ STORE_NAME="postgis_store"
 AUTH="${ADMIN_USER}:${ADMIN_PASS}"
 
 # Wait for GeoServer to be ready 
-echo "⏳ Waiting for GeoServer..."
+echo "Waiting for GeoServer..."
 MAX_WAIT=120
 WAITED=0
 until curl -sf "${GEOSERVER_URL}/web/" > /dev/null 2>&1; do
   if [ "$WAITED" -ge "$MAX_WAIT" ]; then
-    echo "❌ GeoServer did not start within ${MAX_WAIT}s. Exiting."
+    echo " GeoServer did not start within ${MAX_WAIT}s. Exiting."
     exit 1
   fi
   sleep 5
   WAITED=$((WAITED + 5))
   echo "   ...still waiting (${WAITED}s)"
 done
-echo "✅ GeoServer is up!"
+echo "GeoServer is up!"
 
 # Helper: check if resource already exists
 resource_exists() {
@@ -57,7 +57,7 @@ fi
 if resource_exists "${GEOSERVER_URL}/rest/workspaces/${WORKSPACE}/datastores/${STORE_NAME}.json"; then
   echo " DataStore '${STORE_NAME}' already exists — skipping"
 else
-  echo "🗄️  Creating PostGIS datastore: ${STORE_NAME}"
+  echo "  Creating PostGIS datastore: ${STORE_NAME}"
   curl -sf -u "${AUTH}" \
     -X POST "${GEOSERVER_URL}/rest/workspaces/${WORKSPACE}/datastores" \
     -H "Content-Type: application/json" \
@@ -105,7 +105,7 @@ if [ -z "$TABLES" ]; then
 else
   echo "${TABLES}" | while read -r TABLE; do
     if resource_exists "${GEOSERVER_URL}/rest/workspaces/${WORKSPACE}/datastores/${STORE_NAME}/featuretypes/${TABLE}.json"; then
-      echo "  ℹLayer '${TABLE}' already published — skipping"
+      echo "  Layer '${TABLE}' already published — skipping"
     else
       echo " Publishing: ${TABLE}"
       HTTP_CODE=$(curl -s -o /tmp/gs_response.txt -w "%{http_code}" \
