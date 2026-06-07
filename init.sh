@@ -4,7 +4,8 @@
 
 set -euo pipefail
 
-GEOSERVER_URL="${GEOSERVER_URL:-http://localhost:8080/geoserver}"
+PORT="${PORT:-8080}"
+GEOSERVER_URL="${GEOSERVER_URL:-http://localhost:${PORT}/geoserver}"
 ADMIN_USER="${GEOSERVER_ADMIN_USER:-admin}"
 ADMIN_PASS="${GEOSERVER_ADMIN_PASSWORD:-geoserver}"
 
