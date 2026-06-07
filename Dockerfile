@@ -18,10 +18,18 @@ ENV PG_PASSWORD=RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 ENV PORT=8080
 RUN sed -i 's/port="8080"/port="${PORT}"/g' /opt/config/server.xml
 
-# Override base image's EXTRA_JAVA_OPTS (-Xms256m -Xmx1g) — too large for 512MB plan
+# Override base image's EXTRA_JAVA_OPTS (-Xms256m -Xmx1g) — too large for 512MB plan.
+# Both JAVA_OPTS and CATALINA_OPTS (= $EXTRA_JAVA_OPTS + add-exports) are passed to JVM.
+# The last -Xmx flag wins, so CATALINA_OPTS would override JAVA_OPTS without this.
+ENV EXTRA_JAVA_OPTS="-Xms128m -Xmx256m \
+  -XX:+UseG1GC \
+  -XX:MaxGCPauseMillis=200 \
+  -XX:+UseStringDeduplication"
+
 ENV JAVA_OPTS="-Xms128m -Xmx256m \
   -XX:+UseG1GC \
   -XX:MaxGCPauseMillis=200 \
+  -XX:+UseStringDeduplication \
   -XX:MaxMetaspaceSize=128m \
   -XX:CompressedClassSpaceSize=64m \
   -Djava.awt.headless=true \

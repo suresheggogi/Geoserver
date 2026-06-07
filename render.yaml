@@ -29,7 +29,31 @@ services:
       - key: PG_PASSWORD                  
         value: RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
-      
+      # Override base image's EXTRA_JAVA_OPTS (-Xms256m -Xmx1g) 
+      # which would OOM the 512MB starter plan. Both JAVA_OPTS and
+      # CATALINA_OPTS (= $EXTRA_JAVA_OPTS + add-exports) are passed to JVM.
+      - key: EXTRA_JAVA_OPTS
+        value: >-
+          -Xms128m
+          -Xmx256m
+          -XX:+UseG1GC
+          -XX:MaxGCPauseMillis=200
+          -XX:+UseStringDeduplication
+
+      - key: JAVA_OPTS
+        value: >-
+          -Xms128m
+          -Xmx256m
+          -XX:+UseG1GC
+          -XX:MaxGCPauseMillis=200
+          -XX:+UseStringDeduplication
+          -XX:MaxMetaspaceSize=128m
+          -XX:CompressedClassSpaceSize=64m
+          -Djava.awt.headless=true
+          -Dfile.encoding=UTF-8
+          -DGEOSERVER_CSRF_DISABLED=true
+          -DSTOP.PORT=8079
+          -DSTOP.KEY=stopkey
       - key: GEOSERVER_DATA_DIR
         value: /opt/geoserver/data
       - key: GEOWEBCACHE_CACHE_DIR
