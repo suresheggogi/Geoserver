@@ -18,22 +18,21 @@ ENV PG_PASSWORD=RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 ENV PORT=8080
 RUN sed -i 's/port="8080"/port="${PORT}"/g' /opt/config/server.xml
 
-# Override base image's EXTRA_JAVA_OPTS (-Xms256m -Xmx1g) — 1GB heap would OOM the
-# 512MB starter plan. Need to balance heap vs. non-heap:
-#   heap=320m | metaspace=80m | classspace=32m | JVM overhead ~50m | OS ~30m
-# Both JAVA_OPTS and CATALINA_OPTS (= $EXTRA_JAVA_OPTS) are passed to JVM;
-# the last -Xmx flag wins, so both must agree.
-ENV EXTRA_JAVA_OPTS="-Xms128m -Xmx320m \
-  -XX:+UseG1GC \
-  -XX:MaxGCPauseMillis=200 \
-  -XX:+UseStringDeduplication"
+# Service is on free plan — aggressively trim memory.
+# Both JAVA_OPTS and CATALINA_OPTS (= $EXTRA_JAVA_OPTS) are passed to JVM.
+ENV EXTRA_JAVA_OPTS="-Xms96m -Xmx160m \
+  -XX:+UseSerialGC \
+  -XX:MaxGCPauseMillis=500 \
+  -Xss256k \
+  -XX:ReservedCodeCacheSize=64m"
 
-ENV JAVA_OPTS="-Xms128m -Xmx320m \
-  -XX:+UseG1GC \
-  -XX:MaxGCPauseMillis=200 \
-  -XX:+UseStringDeduplication \
-  -XX:MaxMetaspaceSize=80m \
-  -XX:CompressedClassSpaceSize=32m \
+ENV JAVA_OPTS="-Xms96m -Xmx160m \
+  -XX:+UseSerialGC \
+  -XX:MaxGCPauseMillis=500 \
+  -Xss256k \
+  -XX:ReservedCodeCacheSize=64m \
+  -XX:MaxMetaspaceSize=48m \
+  -XX:CompressedClassSpaceSize=16m \
   -Djava.awt.headless=true \
   -Dfile.encoding=UTF-8 \
   -DGEOSERVER_CSRF_DISABLED=true"
