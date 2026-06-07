@@ -29,13 +29,15 @@ services:
       - key: PG_PASSWORD                  
         value: RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
-      # Override base image's EXTRA_JAVA_OPTS (-Xms256m -Xmx1g) 
-      # which would OOM the 512MB starter plan. Both JAVA_OPTS and
-      # CATALINA_OPTS (= $EXTRA_JAVA_OPTS + add-exports) are passed to JVM.
+      # Override base image's EXTRA_JAVA_OPTS (-Xms256m -Xmx1g) — 1GB heap
+      # would OOM the 512MB starter plan. Need to balance heap vs. non-heap:
+      #   heap=320m | metaspace=80m | classspace=32m | JVM overhead ~50m | OS ~30m
+      # Both JAVA_OPTS and CATALINA_OPTS (= $EXTRA_JAVA_OPTS) are passed to JVM;
+      # the last -Xmx flag wins, so both must agree.
       - key: EXTRA_JAVA_OPTS
         value: >-
           -Xms128m
-          -Xmx256m
+          -Xmx320m
           -XX:+UseG1GC
           -XX:MaxGCPauseMillis=200
           -XX:+UseStringDeduplication
@@ -43,17 +45,15 @@ services:
       - key: JAVA_OPTS
         value: >-
           -Xms128m
-          -Xmx256m
+          -Xmx320m
           -XX:+UseG1GC
           -XX:MaxGCPauseMillis=200
           -XX:+UseStringDeduplication
-          -XX:MaxMetaspaceSize=128m
-          -XX:CompressedClassSpaceSize=64m
+          -XX:MaxMetaspaceSize=80m
+          -XX:CompressedClassSpaceSize=32m
           -Djava.awt.headless=true
           -Dfile.encoding=UTF-8
           -DGEOSERVER_CSRF_DISABLED=true
-          -DSTOP.PORT=8079
-          -DSTOP.KEY=stopkey
       - key: GEOSERVER_DATA_DIR
         value: /opt/geoserver/data
       - key: GEOWEBCACHE_CACHE_DIR
