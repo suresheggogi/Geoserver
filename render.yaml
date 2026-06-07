@@ -29,28 +29,23 @@ services:
       - key: PG_PASSWORD                  
         value: RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
-      # Service is on free plan (512MB). GeoServer needs more metaspace for
-      # class loading (hundreds of JARs), so reduce heap to compensate:
-      #   heap=96m | metaspace=96m | classspace=24m | codecache=48m | Xss256k
-      # Total est: ~96+96+24+48+50(overhead)+30(OS)=344m ✓
-      # Both JAVA_OPTS and CATALINA_OPTS (= $EXTRA_JAVA_OPTS) are passed to JVM.
+      # Remove MaxMetaspaceSize - let JVM use available native memory for
+      # class loading. Keep heap very small (64m) to leave room for metaspace.
       - key: EXTRA_JAVA_OPTS
         value: >-
-          -Xms64m
-          -Xmx96m
+          -Xms48m
+          -Xmx64m
           -XX:+UseSerialGC
           -Xss256k
           -XX:ReservedCodeCacheSize=48m
 
       - key: JAVA_OPTS
         value: >-
-          -Xms64m
-          -Xmx96m
+          -Xms48m
+          -Xmx64m
           -XX:+UseSerialGC
           -Xss256k
           -XX:ReservedCodeCacheSize=48m
-          -XX:MaxMetaspaceSize=96m
-          -XX:CompressedClassSpaceSize=24m
           -Djava.awt.headless=true
           -Dfile.encoding=UTF-8
           -DGEOSERVER_CSRF_DISABLED=true
