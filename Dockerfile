@@ -18,6 +18,8 @@ ENV PG_PASSWORD=RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 ENV PORT=8080
 RUN sed -i 's/port="8080"/port="${PORT}"/g' /opt/config/server.xml
 
+# Override base image's EXTRA_JAVA_OPTS (-Xms256m -Xmx1g) — too large for 512MB plan
+ENV EXTRA_JAVA_OPTS="-Xms128m -Xmx256m"
 ENV JAVA_OPTS="-Xms128m -Xmx256m \
   -XX:+UseG1GC \
   -XX:MaxGCPauseMillis=200 \
