@@ -30,7 +30,7 @@ services:
         value: geodb_0hyd
       - key: PG_USER
         value: geodb_0hyd_user
-      - key: PG_PASSWORD                  # ← key name was the password before
+      - key: PG_PASSWORD                  
         value: RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
       - key: JAVA_OPTS
