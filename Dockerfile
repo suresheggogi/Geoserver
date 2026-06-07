@@ -15,6 +15,7 @@ ENV PG_DATABASE=geodb
 ENV PG_USER=geodb_user
 ENV PG_PASSWORD=RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
+ENV SKIP_DEMO_DATA=true
 ENV PORT=8080
 RUN sed -i 's/port="8080"/port="${PORT}"/g' /opt/config/server.xml
 
@@ -29,15 +30,18 @@ ENV JAVA_OPTS="-Xms128m -Xmx256m \
   -Dfile.encoding=UTF-8 \
   -DGEOSERVER_CSRF_DISABLED=true"
 
-COPY init.sh /docker-entrypoint-init.d/init.sh
+COPY init.sh /opt/init.sh
 COPY shapefiles /opt/geoserver/shapefiles
-RUN chmod +x /docker-entrypoint-init.d/init.sh
+COPY entrypoint.sh /opt/entrypoint.sh
+RUN chmod +x /opt/init.sh /opt/entrypoint.sh
 
 VOLUME ["/opt/geoserver/data"]
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=3 \
   CMD curl -sf -o /dev/null "http://localhost:${PORT}/geoserver" || exit 1
+
+ENTRYPOINT ["bash", "/opt/entrypoint.sh"]
 
 # Base image runs as root — keep root for volume write access
 USER root
