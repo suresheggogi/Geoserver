@@ -16,6 +16,8 @@ ENV PG_USER=geodb_user
 ENV PG_PASSWORD=RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
 ENV PORT=8080
+RUN sed -i 's/port="8080"/port="${PORT}"/g' /opt/config/server.xml
+
 ENV JAVA_OPTS="-Xms128m -Xmx256m \
   -XX:+UseG1GC \
   -XX:MaxGCPauseMillis=200 \
@@ -23,8 +25,7 @@ ENV JAVA_OPTS="-Xms128m -Xmx256m \
   -XX:CompressedClassSpaceSize=64m \
   -Djava.awt.headless=true \
   -Dfile.encoding=UTF-8 \
-  -DGEOSERVER_CSRF_DISABLED=true \
-  -Djetty.port=\$PORT"
+  -DGEOSERVER_CSRF_DISABLED=true"
 
 COPY init.sh /docker-entrypoint-init.d/init.sh
 COPY shapefiles /opt/geoserver/shapefiles

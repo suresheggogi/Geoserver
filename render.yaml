@@ -24,8 +24,6 @@ services:
         value: dpg-d82buslckfvc73f7m3j0-a
       - key: PG_PORT
         value: "5432"
-      - key: PORT
-        value: "8080"
       - key: PG_DATABASE
         value: geodb_0hyd
       - key: PG_USER
