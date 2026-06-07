@@ -29,29 +29,28 @@ services:
       - key: PG_PASSWORD                  
         value: RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
-      # Service is on free plan (512MB). GeoServer is memory-heavy, so we
-      # must aggressively trim:  heap=160m | metaspace=48m | classspace=16m |
-      # codecache=64m | threadstack=256k | SerialGC (lower overhead than G1).
+      # Service is on free plan (512MB). GeoServer needs more metaspace for
+      # class loading (hundreds of JARs), so reduce heap to compensate:
+      #   heap=96m | metaspace=96m | classspace=24m | codecache=48m | Xss256k
+      # Total est: ~96+96+24+48+50(overhead)+30(OS)=344m ✓
       # Both JAVA_OPTS and CATALINA_OPTS (= $EXTRA_JAVA_OPTS) are passed to JVM.
       - key: EXTRA_JAVA_OPTS
         value: >-
-          -Xms96m
-          -Xmx160m
+          -Xms64m
+          -Xmx96m
           -XX:+UseSerialGC
-          -XX:MaxGCPauseMillis=500
           -Xss256k
-          -XX:ReservedCodeCacheSize=64m
+          -XX:ReservedCodeCacheSize=48m
 
       - key: JAVA_OPTS
         value: >-
-          -Xms96m
-          -Xmx160m
+          -Xms64m
+          -Xmx96m
           -XX:+UseSerialGC
-          -XX:MaxGCPauseMillis=500
           -Xss256k
-          -XX:ReservedCodeCacheSize=64m
-          -XX:MaxMetaspaceSize=48m
-          -XX:CompressedClassSpaceSize=16m
+          -XX:ReservedCodeCacheSize=48m
+          -XX:MaxMetaspaceSize=96m
+          -XX:CompressedClassSpaceSize=24m
           -Djava.awt.headless=true
           -Dfile.encoding=UTF-8
           -DGEOSERVER_CSRF_DISABLED=true

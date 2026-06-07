@@ -20,19 +20,17 @@ RUN sed -i 's/port="8080"/port="${PORT}"/g' /opt/config/server.xml
 
 # Service is on free plan — aggressively trim memory.
 # Both JAVA_OPTS and CATALINA_OPTS (= $EXTRA_JAVA_OPTS) are passed to JVM.
-ENV EXTRA_JAVA_OPTS="-Xms96m -Xmx160m \
+ENV EXTRA_JAVA_OPTS="-Xms64m -Xmx96m \
   -XX:+UseSerialGC \
-  -XX:MaxGCPauseMillis=500 \
   -Xss256k \
-  -XX:ReservedCodeCacheSize=64m"
+  -XX:ReservedCodeCacheSize=48m"
 
-ENV JAVA_OPTS="-Xms96m -Xmx160m \
+ENV JAVA_OPTS="-Xms64m -Xmx96m \
   -XX:+UseSerialGC \
-  -XX:MaxGCPauseMillis=500 \
   -Xss256k \
-  -XX:ReservedCodeCacheSize=64m \
-  -XX:MaxMetaspaceSize=48m \
-  -XX:CompressedClassSpaceSize=16m \
+  -XX:ReservedCodeCacheSize=48m \
+  -XX:MaxMetaspaceSize=96m \
+  -XX:CompressedClassSpaceSize=24m \
   -Djava.awt.headless=true \
   -Dfile.encoding=UTF-8 \
   -DGEOSERVER_CSRF_DISABLED=true"
