@@ -15,7 +15,6 @@ ENV PG_DATABASE=geodb
 ENV PG_USER=geodb_user
 ENV PG_PASSWORD=RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
-ENV SKIP_DEMO_DATA=true
 ENV PORT=8080
 RUN sed -i 's/port="8080"/port="${PORT}"/g' /opt/config/server.xml
 
