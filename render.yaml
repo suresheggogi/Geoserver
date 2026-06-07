@@ -10,7 +10,7 @@ services:
     disk:
       name: geoserver-data
       mountPath: /opt/geoserver/data
-      sizeGB: 0.01953125
+      sizeMB: 100
 
     envVars:
       - key: GEOSERVER_ADMIN_USER
