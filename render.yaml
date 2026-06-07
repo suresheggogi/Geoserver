@@ -36,7 +36,7 @@ services:
       - key: JAVA_OPTS
         value: >-
           -Xms128m
-          -Xmx400m
+          -Xmx256m
           -XX:+UseG1GC
           -XX:MaxGCPauseMillis=200
           -XX:+UseStringDeduplication
