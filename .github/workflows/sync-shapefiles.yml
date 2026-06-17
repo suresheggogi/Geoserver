@@ -20,11 +20,17 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>&1
+          cat ~/.ssh/known_hosts
+
+      - name: Test SSH connection
+        run: |
+          ssh -o StrictHostKeyChecking=accept-new -p 22222 \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH OK' && ls -d /opt/geoserver/shapefiles 2>&1 || echo 'REMOTE_DIR_MISSING'"
 
       - name: Sync shapefiles to remote server
         run: |
           rsync -avz --delete \
-            -e "ssh -p 22222" \
+            -e "ssh -o StrictHostKeyChecking=accept-new -p 22222" \
             ./shapefiles/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/geoserver/shapefiles/
