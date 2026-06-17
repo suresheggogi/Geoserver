@@ -1,0 +1,32 @@
+name: Sync Shapefiles to Remote Server
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'shapefiles/**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install rsync
+        run: sudo apt-get update && sudo apt-get install -y rsync
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Sync shapefiles to remote server
+        run: |
+          rsync -avz --delete \
+            -e "ssh -p 22222" \
+            ./shapefiles/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/geoserver/shapefiles/
