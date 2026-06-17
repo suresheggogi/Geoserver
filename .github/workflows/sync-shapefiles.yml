@@ -26,8 +26,8 @@ jobs:
           echo "  Port 22222" >> ~/.ssh/config
           echo "  StrictHostKeyChecking accept-new" >> ~/.ssh/config
 
-      - name: Test SSH connection
-        run: ssh remote "echo 'SSH OK' && ls -d /opt/geoserver/shapefiles" || echo "REMOTE_DIR_MISSING"
+      - name: Create remote directory
+        run: ssh remote "mkdir -p /opt/geoserver/shapefiles"
 
       - name: Sync shapefiles to remote server
         run: |
