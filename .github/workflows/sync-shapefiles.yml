@@ -15,22 +15,20 @@ jobs:
       - name: Install rsync
         run: sudo apt-get update && sudo apt-get install -y rsync
 
-      - name: Setup SSH key
+      - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>&1
-          cat ~/.ssh/known_hosts
+          echo "Host remote" >> ~/.ssh/config
+          echo "  HostName ${{ secrets.SSH_HOST }}" >> ~/.ssh/config
+          echo "  User ${{ secrets.SSH_USER }}" >> ~/.ssh/config
+          echo "  Port 22222" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking accept-new" >> ~/.ssh/config
 
       - name: Test SSH connection
-        run: |
-          ssh -o StrictHostKeyChecking=accept-new -p 22222 \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH OK' && ls -d /opt/geoserver/shapefiles 2>&1 || echo 'REMOTE_DIR_MISSING'"
+        run: ssh remote "echo 'SSH OK' && ls -d /opt/geoserver/shapefiles" || echo "REMOTE_DIR_MISSING"
 
       - name: Sync shapefiles to remote server
         run: |
-          rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=accept-new -p 22222" \
-            ./shapefiles/ \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/opt/geoserver/shapefiles/
+          rsync -avz --delete -e ssh ./shapefiles/ remote:/opt/geoserver/shapefiles/
