@@ -27,8 +27,8 @@ jobs:
           echo "  StrictHostKeyChecking accept-new" >> ~/.ssh/config
 
       - name: Create remote directory
-        run: ssh remote "mkdir -p /opt/geoserver/shapefiles"
+        run: ssh remote "mkdir -p /root/Geoserver/shapefiles"
 
       - name: Sync shapefiles to remote server
         run: |
-          rsync -avz --delete -e ssh ./shapefiles/ remote:/opt/geoserver/shapefiles/
+          rsync -avz --delete -e ssh ./shapefiles/ remote:/root/Geoserver/shapefiles/
