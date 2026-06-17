@@ -7,12 +7,10 @@ services:
     plan: starter
     region: oregon
 
-    healthCheckPath: /geoserver/web/
-
     disk:
       name: geoserver-data
       mountPath: /opt/geoserver/data
-      sizeGB: 0.01953125
+      sizeMB: 100
 
     envVars:
       - key: GEOSERVER_ADMIN_USER
@@ -24,8 +22,6 @@ services:
         value: dpg-d82buslckfvc73f7m3j0-a
       - key: PG_PORT
         value: "5432"
-      - key: PORT
-        value: "8080"
       - key: PG_DATABASE
         value: geodb_0hyd
       - key: PG_USER
@@ -33,21 +29,26 @@ services:
       - key: PG_PASSWORD                  
         value: RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
+      # Remove MaxMetaspaceSize - let JVM use available native memory for
+      # class loading. Keep heap very small (64m) to leave room for metaspace.
+      - key: EXTRA_JAVA_OPTS
+        value: >-
+          -Xms48m
+          -Xmx64m
+          -XX:+UseSerialGC
+          -Xss256k
+          -XX:ReservedCodeCacheSize=48m
+
       - key: JAVA_OPTS
         value: >-
-          -Xms128m
-          -Xmx400m
-          -XX:+UseG1GC
-          -XX:MaxGCPauseMillis=200
-          -XX:+UseStringDeduplication
-          -XX:MaxMetaspaceSize=128m
-          -XX:CompressedClassSpaceSize=64m
+          -Xms48m
+          -Xmx64m
+          -XX:+UseSerialGC
+          -Xss256k
+          -XX:ReservedCodeCacheSize=48m
           -Djava.awt.headless=true
           -Dfile.encoding=UTF-8
           -DGEOSERVER_CSRF_DISABLED=true
-          -DSTOP.PORT=8079
-          -DSTOP.KEY=stopkey
-
       - key: GEOSERVER_DATA_DIR
         value: /opt/geoserver/data
       - key: GEOWEBCACHE_CACHE_DIR

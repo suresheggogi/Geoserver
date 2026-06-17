@@ -16,23 +16,35 @@ ENV PG_USER=geodb_user
 ENV PG_PASSWORD=RLzoieV1g6cJYmi5ZUvLuVK9rxhLdCqm
 
 ENV PORT=8080
-ENV JAVA_OPTS="-Xms128m -Xmx400m \
-  -XX:+UseG1GC \
-  -XX:MaxGCPauseMillis=200 \
-  -XX:MaxMetaspaceSize=128m \
+RUN sed -i 's/port="8080"/port="${PORT}"/g' /opt/config/server.xml
+
+# Service is on free plan — aggressively trim memory.
+# Both JAVA_OPTS and CATALINA_OPTS (= $EXTRA_JAVA_OPTS) are passed to JVM.
+ENV EXTRA_JAVA_OPTS="-Xms48m -Xmx64m \
+  -XX:+UseSerialGC \
+  -Xss256k \
+  -XX:ReservedCodeCacheSize=48m"
+
+ENV JAVA_OPTS="-Xms48m -Xmx64m \
+  -XX:+UseSerialGC \
+  -Xss256k \
+  -XX:ReservedCodeCacheSize=48m \
   -Djava.awt.headless=true \
   -Dfile.encoding=UTF-8 \
-  -DGEOSERVER_CSRF_DISABLED=true \
-  -Djetty.port=\$PORT"
+  -DGEOSERVER_CSRF_DISABLED=true"
 
-COPY init.sh /docker-entrypoint-init.d/init.sh
+COPY init.sh /opt/init.sh
 COPY shapefiles /opt/geoserver/shapefiles
-RUN chmod +x /docker-entrypoint-init.d/init.sh
+COPY entrypoint.sh /opt/entrypoint.sh
+RUN chmod +x /opt/init.sh /opt/entrypoint.sh
 
 VOLUME ["/opt/geoserver/data"]
 EXPOSE 8080
 
-HEALTHCHECK --interval=30s --timeout=15s --start-period=90s --retries=3 \
-  CMD /bin/sh -c 'curl -sf "http://localhost:$PORT/geoserver/web/" || exit 1'
+HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=3 \
+  CMD curl -sf -o /dev/null "http://localhost:${PORT}/geoserver" || exit 1
 
-USER geoserver
+ENTRYPOINT ["bash", "/opt/entrypoint.sh"]
+
+# Base image runs as root — keep root for volume write access
+USER root
