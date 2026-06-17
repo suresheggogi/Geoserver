@@ -47,4 +47,8 @@ HEALTHCHECK --interval=30s --timeout=15s --start-period=120s --retries=3 \
 ENTRYPOINT ["bash", "/opt/entrypoint.sh"]
 
 # Base image runs as root — keep root for volume write access
+<<<<<<< HEAD
 USER root
+=======
+USER root
+>>>>>>> 40d125d7e2fca83390313edfcc7b5538c3b5b9b1

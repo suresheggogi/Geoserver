@@ -177,7 +177,7 @@ else
 fi
 
 echo ""
-echo " init.sh complete!"
+echo " init.sh complete!!"
 echo "   UI:  ${GEOSERVER_URL}/web/"
 echo "   WMS: ${GEOSERVER_URL}/${WORKSPACE}/wms"
 echo "   WFS: ${GEOSERVER_URL}/${WORKSPACE}/wfs"
